@@ -1,3 +1,8 @@
+# Логаут не работает(xpath вроде верный)
+# С модулем "профиль" такая же ситуация
+
+
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
@@ -89,7 +94,7 @@ def test_negative_email_authorization_1():
         pass
 
 
-def test_negative_email_authorization_1():
+def test_profile_change():
     driver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
     driver.get("https://target-sandbox.my.com/")
     driver.maximize_window()
