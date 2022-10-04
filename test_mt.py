@@ -21,8 +21,12 @@ def test_authorization():
 
     button_login = driver.find_element(By.XPATH, "//div[contains(@class,'1u2DYF')]")
     button_login.click()
-    driver.close()
+    time.sleep(4)
+    title_text = driver.find_element(By.XPATH, "//div[contains(@class,'right-module-userNameWrap-3Odw2D')]")
+    if title_text.text == "idarsho@gmail.com":
+        print("Мы попали на главную страницу")
 
+    driver.close()
 
 def test_logout():
     driver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
@@ -107,10 +111,11 @@ def test_profile_change():
     driver.quit()
 
 
-@pytest.mark.parametrize("section, xpath, result", [('balance', '//a[contains(@class,"center-module-button-14O4yB center-module-billing-1cIfj4")]', '//input[contains(@class,"deposit__payment-form__submit js-deposit-payment-submit")]')])
+@pytest.mark.parametrize("section, xpath, result", [('balance', '//a[contains(@class,"center-module-button-14O4yB center-module-billing-1cIfj4")]', '//input[contains(@class,"deposit__payment-form__submit js-deposit-payment-submit")]'), ('profile', '//a[contains(@class,"center-module-button-14O4yB center-module-profile-1kuUOa")]', '// button[contains(@class, "button button_submit")]')])
 def test_parametrize_1(section, xpath, result):
     driver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
     driver.get("https://target-sandbox.my.com/")
+    driver.maximize_window()
     time.sleep(5)
 
     button_input = driver.find_element(By.XPATH, "//div[contains(@class,'2yl51i')]")
