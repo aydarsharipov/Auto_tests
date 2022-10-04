@@ -4,33 +4,24 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
-def pytest_addoption(parser):
-    parser.addoption("--browser", default="chrome")
-    parser.addoption("--url", default="https://www.python.org/")
 
-
-@pytest.fixture()
-def config(request):
-    browser = request.config.getoption("--browser")
-    url = request.config.getoption("--url")
-    return {"browser": browser, "url": url}
-
-
+# @pytest.fixture(scope='function', autouse=True)
 def test_authorization():
-    try:
-        driver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
-        driver.get("https://target-sandbox.my.com/")
-        time.sleep(5)
+    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
+    driver.get("https://target-sandbox.my.com/")
+    time.sleep(5)
 
-        button_input = driver.find_element(By.XPATH, "//div[contains(@class,'2yl51i')]").click()
+    button_input = driver.find_element(By.XPATH, "//div[contains(@class,'2yl51i')]")
+    button_input.click()
 
-        search_email = driver.find_element(By.NAME, "email").send_keys("idarsho@gmail.com")
-        search_password = driver.find_element(By.NAME, "password").send_keys("1234567890A")
+    search_email = driver.find_element(By.NAME, "email")
+    search_email.send_keys("idarsho@gmail.com")
+    search_password = driver.find_element(By.NAME, "password")
+    search_password.send_keys("1234567890A")
 
-        button_login = driver.find_element(By.XPATH, "//div[contains(@class,'1u2DYF')]").click()
-        assert Exception
-    finally:
-        driver.quit()
+    button_login = driver.find_element(By.XPATH, "//div[contains(@class,'1u2DYF')]")
+    button_login.click()
+    driver.close()
 
 
 def test_logout():
@@ -38,62 +29,43 @@ def test_logout():
     driver.get("https://target-sandbox.my.com/")
     time.sleep(5)
 
-    button_input = driver.find_element(By.XPATH, "//div[contains(@class,'2yl51i')]").click()
+    button_input = driver.find_element(By.XPATH, "//div[contains(@class,'2yl51i')]")
+    button_input.click()
     time.sleep(2)
 
     search_email = driver.find_element(By.NAME, "email").send_keys("idarsho@gmail.com")
 
     search_password = driver.find_element(By.NAME, "password").send_keys("1234567890A")
 
-    button_login = driver.find_element(By.XPATH, "//div[contains(@class,'1u2DYF')]").click()
+    button_login = driver.find_element(By.XPATH, "//div[contains(@class,'1u2DYF')]")
+    button_login.click()
+    time.sleep(3)
+
+    button_profile = driver.find_element(By.XPATH, "//div[contains(@class,'3e-duF')]").click()
     time.sleep(2)
-
-    user_module = driver.find_element(By.CSS_SELECTOR, "//div[contains(@class,'blvNjE')]").click()
+    button_logout = driver.find_element(By.XPATH, "//a[contains(@href,'/logout')]").click()
     time.sleep(2)
-
-    button_logout = driver.find_element(By.XPATH, "//a[contains(@class,'2j8bjX')]").click()
-    time.sleep(2)
+    driver.close()
 
 
-def test_negative_password_authorization_1():
-    try:
-        driver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
-        driver.get("https://target-sandbox.my.com/")
-        time.sleep(5)
+@pytest.mark.parametrize("email, password, result", [("idarshogmail.com", "1234567890A", "Введите email или телефон"), ("idarsho@gmail.com", "1239567899A", "Invalid login or password")])
+def test_negative_authorization_1(email, password, result):
+    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
+    driver.get("https://target-sandbox.my.com/")
+    time.sleep(5)
 
-        button_input = driver.find_element(By.XPATH, "//div[contains(@class,'2yl51i')]").click()
+    button_input = driver.find_element(By.XPATH, "//div[contains(@class,'2yl51i')]")
+    button_input.click()
 
-        search_email = driver.find_element(By.NAME, "email").send_keys("idarsho@gmail.com")
+    search_email = driver.find_element(By.NAME, "email")
+    search_email.send_keys(email)
+    search_password = driver.find_element(By.NAME, "password")
+    search_password.send_keys(password)
+    button_login = driver.find_element(By.XPATH, "//div[contains(@class,'1u2DYF')]")
+    button_login.click()
+    assert result in driver.page_source
+    driver.close()
 
-        search_password = driver.find_element(By.NAME, "password").send_keys("1234567899A")
-
-        button_login = driver.find_element(By.XPATH, "//div[contains(@class,'1u2DYF')]").click()
-
-        assert "Invalid login or password" != '<html lang=...body></html>'
-    finally:
-        driver.quit()
-
-
-def test_negative_email_authorization_1():
-    try:
-        driver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
-        driver.get("https://target-sandbox.my.com/")
-        time.sleep(5)
-
-        button_input = driver.find_element(By.XPATH, "//div[contains(@class,'2yl51i')]").click()
-        time.sleep(2)
-
-        search_email = driver.find_element(By.NAME, "email").send_keys("idarsho177@gmail.com")
-
-        search_password = driver.find_element(By.NAME, "password").send_keys("1234567890A")
-
-        button_login = driver.find_element(By.XPATH, "//div[contains(@class,'1u2DYF')]").click()
-        time.sleep(2)
-
-        assert "Invalid login or password" not in '<html lang=...body></html>'
-        time.sleep(5)
-    finally:
-        driver.quit()
 
 
 
@@ -103,51 +75,64 @@ def test_profile_change():
     driver.maximize_window()
     time.sleep(5)
 
-    button_input = driver.find_element(By.XPATH, "//div[contains(@class,'2yl51i')]").click()
+    button_input = driver.find_element(By.XPATH, "//div[contains(@class,'2yl51i')]")
+    button_input.click()
     time.sleep(2)
 
-    search_email = driver.find_element(By.NAME, "email").send_keys("idarsho@gmail.com")
+    search_email = driver.find_element(By.NAME, "email")
+    search_email.send_keys("idarsho@gmail.com")
 
-    search_password = driver.find_element(By.NAME, "password").send_keys("1234567890A")
+    search_password = driver.find_element(By.NAME, "password")
+    search_password.send_keys("1234567890A")
 
-    button_login = driver.find_element(By.XPATH, "//div[contains(@class,'1u2DYF')]").click()
+    button_login = driver.find_element(By.XPATH, "//div[contains(@class,'1u2DYF')]")
+    button_login.click()
     time.sleep(2)
 
-    module_profile = driver.find_element(By.XPATH, "//a[contains(@class,'1vgS83')]").click()
-    time.sleep(10)
+    module_profile = driver.find_element(By.XPATH,
+                                         "//a[contains(@class,'center-module-button-14O4yB center-module-profile-1kuUOa')]")
+    module_profile.click()
+    time.sleep(5)
 
-def test_parametrize():
+    phone_number = driver.find_element(By.XPATH, "// input[contains(@maxlength, '20')]")
+    phone_number.clear()
+    phone_number.send_keys("+79167000154")
+
+    save_button = driver.find_element(By.XPATH, "// button[contains(@class, 'button button_submit')]")
+    save_button.click()
+    time.sleep(2)
+
+    assert "Информация успешно сохранена" in driver.page_source
+
+    driver.quit()
+
+
+@pytest.mark.parametrize("section, xpath, result", [('balance', '//a[contains(@class,"center-module-button-14O4yB center-module-billing-1cIfj4")]', '//input[contains(@class,"deposit__payment-form__submit js-deposit-payment-submit")]')])
+def test_parametrize_1(section, xpath, result):
+    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
     driver.get("https://target-sandbox.my.com/")
     time.sleep(5)
-    button_input = driver.find_element(By.XPATH, "//div[contains(@class,'2yl51i')]").click()
 
-    search_email = driver.find_element(By.NAME, "email").send_keys("idarsho@gmail.com")
+    button_input = driver.find_element(By.XPATH, "//div[contains(@class,'2yl51i')]")
+    button_input.click()
 
-    search_password = driver.find_element(By.NAME, "password").send_keys("1234567890A")
+    search_email = driver.find_element(By.NAME, "email")
+    search_email.send_keys("idarsho@gmail.com")
 
-    button_login = driver.find_element(By.XPATH, "//div[contains(@class,'1u2DYF')]").click()
+    search_password = driver.find_element(By.NAME, "password")
+    search_password.send_keys("1234567890A")
 
+    button_login = driver.find_element(By.XPATH, "//div[contains(@class,'1u2DYF')]")
+    button_login.click()
+    time.sleep(3)
 
-@pytest.fixture()
-def config(request):
-    browser = request.config.getoption("--browser")
-    url = request.config.getoption("--url")
-    return {"browser": browser, "url": url}
+    module_statistics = driver.find_element(By.XPATH, "//a[contains(@class,'center-module-button-14O4yB center-module-statistics-2Wbrwh')]")
+    module_statistics.click()
+    time.sleep(5)
 
+    module_section = driver.find_element(By.XPATH, xpath)
+    module_section.click()
+    time.sleep(5)
 
-@pytest.fixture(scope='function')
-def driver(config):
-    browser = config["browser"]
-    url = config["url"]
-
-    if browser == "chrome":
-        driver = webdriver.Chrome(executable_path=ChromeDriverManager().install())
-    elif browser == "firefox":
-        pass
-    else:
-        raise RuntimeError(f'Unsupported browser: "{browser}"')
-
-    driver.get(url)
-    driver.maximize_window()
-    yield driver
+    assert driver.find_element(By.XPATH, result)
     driver.quit()
