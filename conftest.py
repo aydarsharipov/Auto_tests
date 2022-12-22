@@ -34,7 +34,7 @@ def driver(config):
         raise RuntimeError(f'Unsupported browser: "{browser}"')
 
     driver.get(url)
-    time.sleep(7)
+    driver.implicitly_wait(10)
     driver.maximize_window()
     yield driver
     driver.quit()
